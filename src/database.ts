@@ -1,4 +1,4 @@
-import { DB } from '../db/types';
+import { DB } from './db/types';
 import { Pool } from 'pg';
 import { Kysely, PostgresDialect } from 'kysely'
 import dotenv from 'dotenv';
