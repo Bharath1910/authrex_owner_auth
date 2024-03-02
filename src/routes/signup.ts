@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { KyselyError, isKyselyError } from '../types'
 import { StatusCodes } from 'http-status-codes';
 import { db } from '../database';
+import jwt from 'jsonwebtoken';
 
 export async function signup(
 	req: Request,
@@ -20,8 +21,14 @@ export async function signup(
 			.returning('Owner.id')
 			.executeTakeFirstOrThrow();
 
-		console.log(user.id);
-		res.send('User created');
+		const token = jwt.sign(
+			{id: user.id},
+			process.env.JWT_SECRET as string
+		)
+
+		res
+			.status(StatusCodes.CREATED)
+			.send({token});
 
 	} catch (e: KyselyError | any) {
 		if (!isKyselyError(e)) {

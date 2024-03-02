@@ -21,3 +21,6 @@ services:
         
         - action: rebuild
           path: ./package.json
+
+        - action: rebuild
+          path: ./.env
