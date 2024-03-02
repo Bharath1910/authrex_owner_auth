@@ -1,0 +1,23 @@
+version: "3"
+services:
+  owner_auth:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+
+    ports:
+      - 5002:5000
+
+    env_file:
+      - .env
+    
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /app/src
+          ignore:
+            - node_modules/
+        
+        - action: rebuild
+          path: ./package.json
