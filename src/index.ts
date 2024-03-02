@@ -1,13 +1,13 @@
-import express, { Express, Request, Response } from 'express';
+import express, { Express } from 'express';
+
+import { signup } from './routes/signup';
 
 const app: Express = express();
-const port = 3000;
+const port = 5000;
 
 app.use(express.json());
 
-app.get('/', (req: Request, res: Response) => {
-	res.send('Hello World!');
-});
+app.post('/signup', signup);
 
 app.listen(port, () => {
 	console.log(`Server is running on port ${port}`);
