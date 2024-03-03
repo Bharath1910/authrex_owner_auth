@@ -4,20 +4,31 @@ import { isKyselyError, KyselyError } from '../types';
 import { StatusCodes } from 'http-status-codes';
 import { db } from '../database';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 
 export async function signup(
 	req: Request,
 	res: Response
 ): Promise<void> {
-	const username: string = req.body.username;
-	const password: string = req.body.password;
+	const username: string | undefined = req.body.username;
+	const password: string | undefined = req.body.password;
+
+	if (!username || !password) {
+		res
+			.status(StatusCodes.BAD_REQUEST)
+			.send({error: 'Username and password are required'});
+		return;
+	}
+
+	const salt = await bcrypt.genSalt(10);
+	const hash = await bcrypt.hash(password, salt);
 
 	try {
 		const user = await db
 			.insertInto('Owner')
 			.values({
 				username,
-				password,
+				password: hash,
 			})
 			.returning('Owner.id')
 			.executeTakeFirstOrThrow();

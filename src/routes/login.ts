@@ -1,11 +1,15 @@
 import { Request, Response } from 'express';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { KyselyError, isKyselyError } from '../types';
 import { StatusCodes } from 'http-status-codes';
 import { db } from '../database';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { NoResultError } from 'kysely';
 
-export async function login(req: Request, res: Response): Promise<void> {
+export async function login(
+	req: Request,
+	res: Response
+): Promise<void> {
 	const username: string = req.body.username;
 	const password: string = req.body.password;
 
@@ -16,7 +20,8 @@ export async function login(req: Request, res: Response): Promise<void> {
 			.where('username', '=', username)
 			.executeTakeFirstOrThrow();
 		
-		if (user.password !== password) {
+		const match = await bcrypt.compare(password, user.password);
+		if (!match) {
 			res
 				.status(StatusCodes.BAD_REQUEST)
 				.send({error: 'Invalid password'});
@@ -31,17 +36,16 @@ export async function login(req: Request, res: Response): Promise<void> {
 		res
 			.status(StatusCodes.OK)
 			.send({token});
-	} catch (e: KyselyError | unknown) {
-		console.log(e);
-		if (!isKyselyError(e)) {
+	} catch (e: NoResultError | unknown) {
+		if (!(e instanceof NoResultError)) {
 			res
 				.status(StatusCodes.INTERNAL_SERVER_ERROR)
-				.send({error: 'Invalid username'});
+				.send({error: '..'});
 			return;
 		}
 
 		res
-			.status(StatusCodes.INTERNAL_SERVER_ERROR)
+			.status(StatusCodes.BAD_REQUEST)
 			.send({error: 'Invalid username but kysely error'});
 	}
 }
