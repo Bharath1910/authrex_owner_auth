@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import { KyselyError, isKyselyError } from '../types'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { isKyselyError, KyselyError } from '../types';
 import { StatusCodes } from 'http-status-codes';
 import { db } from '../database';
 import jwt from 'jsonwebtoken';
@@ -24,13 +25,13 @@ export async function signup(
 		const token = jwt.sign(
 			{id: user.id},
 			process.env.JWT_SECRET as string
-		)
+		);
 
 		res
 			.status(StatusCodes.CREATED)
 			.send({token});
 
-	} catch (e: KyselyError | any) {
+	} catch (e: KyselyError | unknown) {
 		if (!isKyselyError(e)) {
 			res
 				.status(StatusCodes.INTERNAL_SERVER_ERROR)
