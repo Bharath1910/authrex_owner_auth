@@ -1,23 +1,23 @@
-export function isKyselyError(err: any): err is KyselyError {
-	return err && err.severity && err.code && err.detail;
-};
-
 export type KyselyError = {
 	length: number;
-	severity: 'ERROR' | any;
+	severity: 'ERROR' | unknown;
 	code: string;
 	detail: string;
-	hint: any;
-	position: any;
-	internalPosition: any;
-	internalQuery: any;
-	where: any;
+	hint: unknown;
+	position: unknown;
+	internalPosition: unknown;
+	internalQuery: unknown;
+	where: unknown;
 	schema: string;
 	table: string;
 	column: string;
-	dataType: any;
+	dataType: unknown;
 	constraint: string;
 	file: string;
 	line: string;
 	routine: string; 
+}
+
+export function isKyselyError(err: unknown): err is KyselyError {
+	return !!(err as KyselyError)?.severity && !!(err as KyselyError)?.code && !!(err as KyselyError)?.detail;
 }
